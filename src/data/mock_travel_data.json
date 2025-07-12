@@ -1,0 +1,190 @@
+{
+  "flights": [
+    {
+      "flight_id": "FL001",
+      "origin": "LAX",
+      "destination": "JFK",
+      "departure_date": "2024-09-10",
+      "departure_time": "08:00",
+      "arrival_time": "16:00",
+      "airline": "Global Airlines",
+      "price": 350.00,
+      "available_seats": 10,
+      "return_date": "2024-09-15",
+      "duration_hours": 8
+    },
+    {
+      "flight_id": "FL002",
+      "origin": "JFK",
+      "destination": "LAX",
+      "departure_date": "2024-09-15",
+      "departure_time": "10:00",
+      "arrival_time": "18:00",
+      "airline": "Global Airlines",
+      "price": 350.00,
+      "available_seats": 12,
+      "return_date": null,
+      "duration_hours": 8
+    },
+    {
+      "flight_id": "FL003",
+      "origin": "LAX",
+      "destination": "CDG",
+      "departure_date": "2024-10-01",
+      "departure_time": "14:00",
+      "arrival_time": "07:00",
+      "airline": "TransAtlantic Air",
+      "price": 750.00,
+      "available_seats": 25,
+      "return_date": "2024-10-08",
+      "duration_hours": 11
+    },
+    {
+      "flight_id": "FL004",
+      "origin": "CDG",
+      "destination": "LAX",
+      "departure_date": "2024-10-08",
+      "departure_time": "10:00",
+      "arrival_time": "13:00",
+      "airline": "TransAtlantic Air",
+      "price": 700.00,
+      "available_seats": 18,
+      "return_date": null,
+      "duration_hours": 10
+    },
+    {
+      "flight_id": "FL005",
+      "origin": "LHR",
+      "destination": "FCO",
+      "departure_date": "2024-11-05",
+      "departure_time": "09:00",
+      "arrival_time": "12:00",
+      "airline": "EuroConnect",
+      "price": 120.00,
+      "available_seats": 30,
+      "return_date": "2024-11-10",
+      "duration_hours": 3
+    },
+    {
+      "flight_id": "FL006",
+      "origin": "ORD",
+      "destination": "MIA",
+      "departure_date": "2024-12-20",
+      "departure_time": "11:00",
+      "arrival_time": "14:30",
+      "airline": "Sunshine Air",
+      "price": 280.00,
+      "available_seats": 8,
+      "return_date": "2024-12-27",
+      "duration_hours": 3.5
+    }
+  ],
+  "hotels": [
+    {
+      "hotel_id": "H001",
+      "name": "The Parisian Grand",
+      "destination": "Paris",
+      "rating": 4.8,
+      "price_per_night": 350.00,
+      "max_guests_per_room": 2,
+      "amenities": ["wifi", "pool", "spa", "restaurant"],
+      "description": "Luxurious hotel near the Eiffel Tower."
+    },
+    {
+      "hotel_id": "H002",
+      "name": "Rome Historical Inn",
+      "destination": "Rome",
+      "rating": 4.2,
+      "price_per_night": 200.00,
+      "max_guests_per_room": 3,
+      "amenities": ["wifi", "breakfast", "city view"],
+      "description": "Charming inn located in the heart of ancient Rome."
+    },
+    {
+      "hotel_id": "H003",
+      "name": "Beachfront Paradise Cancun",
+      "destination": "Cancun",
+      "rating": 4.5,
+      "price_per_night": 300.00,
+      "max_guests_per_room": 4,
+      "amenities": ["wifi", "pool", "beach access", "all-inclusive"],
+      "description": "Family-friendly resort with direct beach access."
+    },
+    {
+      "hotel_id": "H004",
+      "name": "New York City Loft",
+      "destination": "New York",
+      "rating": 3.9,
+      "price_per_night": 280.00,
+      "max_guests_per_room": 2,
+      "amenities": ["wifi", "kitchenette"],
+      "description": "Modern loft apartment in Manhattan."
+    },
+    {
+      "hotel_id": "H005",
+      "name": "London Riverside Suites",
+      "destination": "London",
+      "rating": 4.3,
+      "price_per_night": 220.00,
+      "max_guests_per_room": 2,
+      "amenities": ["wifi", "gym", "river view"],
+      "description": "Elegant suites overlooking the Thames."
+    }
+  ],
+  "activities": [
+    {
+      "activity_id": "A001",
+      "name": "Eiffel Tower Summit Experience",
+      "destination": "Paris",
+      "price": 60.00,
+      "duration_hours": 2.5,
+      "tags": ["sightseeing", "iconic", "views"],
+      "description": "Access to the top of the Eiffel Tower."
+    },
+    {
+      "activity_id": "A002",
+      "name": "Colosseum & Roman Forum Guided Tour",
+      "destination": "Rome",
+      "price": 75.00,
+      "duration_hours": 3.0,
+      "tags": ["history", "ancient", "guided tour"],
+      "description": "Explore the ancient heart of Rome with an expert."
+    },
+    {
+      "activity_id": "A003",
+      "name": "Cancun Snorkeling with Turtles",
+      "destination": "Cancun",
+      "price": 95.00,
+      "duration_hours": 4.0,
+      "tags": ["adventure", "water sports", "wildlife"],
+      "description": "Snorkeling tour to see sea turtles in their natural habitat."
+    },
+    {
+      "activity_id": "A004",
+      "name": "Broadway Show Tickets",
+      "destination": "New York",
+      "price": 150.00,
+      "duration_hours": 2.5,
+      "tags": ["entertainment", "theater", "culture"],
+      "description": "Experience a world-class Broadway musical."
+    },
+    {
+      "activity_id": "A005",
+      "name": "British Museum Exploration",
+      "destination": "London",
+      "price": 0.00,
+      "duration_hours": 3.0,
+      "tags": ["museums", "history", "free"],
+      "description": "Discover global history and culture at the British Museum."
+    },
+    {
+      "activity_id": "A006",
+      "name": "Paris Seine River Cruise",
+      "destination": "Paris",
+      "price": 30.00,
+      "duration_hours": 1.0,
+      "tags": ["sightseeing", "romantic", "leisure"],
+      "description": "Enjoy stunning views of Paris from the Seine."
+    }
+  ]
+}
