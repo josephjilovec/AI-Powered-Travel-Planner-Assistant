@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Travel Planner Assistant</title>
+    <!-- Tailwind CSS CDN for utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Inter for a clean, modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Link to custom stylesheet for specific overrides or complex layouts -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Custom styles to ensure Inter font is applied and basic layout */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align content to top */
+            padding: 1.5rem;
+            box-sizing: border-box;
+        }
+        .main-container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* Large rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Soft, subtle shadow */
+            width: 100%;
+            max-width: 1200px; /* Wider container for more content */
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        /* Specific styling for chat bubble */
+        .chat-message.user {
+            background-color: #e0f2fe; /* Light blue for user messages */
+            align-self: flex-end; /* Align user messages to the right */
+            border-bottom-right-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            border-bottom-left-radius: 1.25rem;
+            border-top-left-radius: 1.25rem;
+        }
+        .chat-message.assistant {
+            background-color: #f1f5f9; /* Lighter gray for assistant messages */
+            align-self: flex-start; /* Align assistant messages to the left */
+            border-bottom-left-radius: 0.5rem;
+            border-top-left-radius: 0.5rem;
+            border-bottom-right-radius: 1.25rem;
+            border-top-right-radius: 1.25rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .main-container {
+                padding: 1.5rem;
+                border-radius: 1rem;
+            }
+            .chat-area, .results-area {
+                flex-basis: 100%; /* Stack on small screens */
+            }
+            .chat-input-container {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .chat-input-container textarea,
+            .chat-input-container button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <div class="main-container">
+        <!-- Header Section -->
+        <header class="text-center mb-6">
+            <h1 class="text-4xl font-extrabold text-blue-700 leading-tight">AI-Powered Travel Planner</h1>
+            <p class="text-lg text-gray-600 mt-2">Your intelligent assistant for personalized vacation planning.</p>
+        </header>
+
+        <!-- Main Content Area: Chat and Results -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Chat Interface Area -->
+            <section class="chat-area flex-1 bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col h-[600px]">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Let's Plan Your Trip!</h2>
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 border border-gray-300 rounded-lg bg-gray-50 mb-4 flex flex-col gap-3">
+                    <!-- Chat messages will be dynamically inserted here -->
+                    <div class="chat-message assistant max-w-[80%] p-3 rounded-xl shadow-sm">
+                        <p>Hello! I'm your AI Travel Planner. Tell me about your dream vacation. Where do you want to go, when, and with whom?</p>
+                    </div>
+                </div>
+                <div class="chat-input-container flex gap-3">
+                    <textarea id="user-input" class="flex-1 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="3" placeholder="Type your travel plans or questions here..."></textarea>
+                    <button id="send-button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-md transition duration-200 ease-in-out transform hover:scale-105 active:scale-95">Send</button>
+                </div>
+                <div id="loading-indicator" class="text-center text-gray-500 mt-3 hidden">
+                    <p>Thinking...</p>
+                    <div class="animate-pulse text-blue-500">•••</div>
+                </div>
+                <div id="error-message" class="text-red-600 text-center mt-3 hidden"></div>
+            </section>
+
+            <!-- Results Display Area (Recommendations & Itinerary) -->
+            <section class="results-area flex-1 bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Your Trip Plan</h2>
+
+                <!-- Tab Navigation for Results -->
+                <div class="flex border-b border-gray-200 mb-4">
+                    <button class="tab-button active flex-1 py-3 text-center text-lg font-medium text-blue-600 border-b-2 border-blue-600 hover:text-blue-700 transition duration-200" data-tab="recommendations">Recommendations</button>
+                    <button class="tab-button flex-1 py-3 text-center text-lg font-medium text-gray-600 hover:text-gray-800 transition duration-200" data-tab="itinerary">Itinerary</button>
+                </div>
+
+                <!-- Tab Content: Recommendations -->
+                <div id="recommendations-content" class="tab-content active overflow-y-auto flex-1">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-3">Suggested Options</h3>
+                    <div id="recommended-flights" class="mb-4 p-4 bg-blue-50 rounded-lg">
+                        <h4 class="font-bold text-blue-800 mb-2">Flights</h4>
+                        <p class="text-gray-600">No flight recommendations yet.</p>
+                    </div>
+                    <div id="recommended-hotels" class="mb-4 p-4 bg-green-50 rounded-lg">
+                        <h4 class="font-bold text-green-800 mb-2">Hotels</h4>
+                        <p class="text-gray-600">No hotel recommendations yet.</p>
+                    </div>
+                    <div id="recommended-activities" class="p-4 bg-purple-50 rounded-lg">
+                        <h4 class="font-bold text-purple-800 mb-2">Activities</h4>
+                        <p class="text-gray-600">No activity recommendations yet.</p>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Itinerary -->
+                <div id="itinerary-content" class="tab-content overflow-y-auto flex-1 hidden">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-3">Your Daily Plan</h3>
+                    <div id="itinerary-details">
+                        <p class="text-gray-600">No itinerary generated yet. Please provide your travel preferences in the chat!</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Link to custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
