@@ -1,0 +1,26 @@
+# requirements.txt
+# This file lists all Python dependencies required for the AI-Powered Travel Planner Assistant project.
+# It includes dependencies for both the Flask backend (Applications Layer) and the AI Agents (Agents Layer).
+# Install these dependencies using pip: pip install -r requirements.txt
+
+# --- Core Application Dependencies (Flask Backend) ---
+Flask>=3.0.0             # Web framework for the Applications Layer (backend)
+Flask-Cors>=4.0.0        # For handling Cross-Origin Resource Sharing in Flask applications
+
+# --- AI/LLM & Asynchronous HTTP Dependencies (Agents Layer) ---
+httpx>=0.27.0            # Asynchronous HTTP client for making API calls (e.g., to Gemini API)
+python-dotenv>=1.0.0     # For loading environment variables from .env files
+
+# --- Data Handling & Utilities ---
+PyYAML>=6.0.1            # For parsing YAML configuration files (if used for mock data or other configs)
+
+# --- Optional: Google's official Generative AI client library ---
+# The current GeminiService uses httpx directly for flexibility.
+# If you prefer to use Google's official client library, uncomment the line below.
+# google-generativeai>=0.5.0
+
+# --- Development and Testing Dependencies (usually installed in dev environments) ---
+pytest>=8.0.0            # Testing framework
+pytest-asyncio>=0.23.0   # For testing asynchronous code with pytest
+flake8>=7.0.0            # Linter for enforcing style guide (PEP8)
+black>=24.0.0            # Uncompromising Python code formatter
