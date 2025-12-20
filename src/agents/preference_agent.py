@@ -13,8 +13,15 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from src.agents.base_agent import BaseAgent
 from utils.logger import get_logger
+from utils.mock_data import get_mock_preferences
 
 logger = get_logger(__name__)
 
@@ -69,15 +76,21 @@ Be concise and only extract information that is explicitly mentioned or clearly 
             user_input = str(input_data["user_input"])
             logger.info(f"Processing preferences for user input: {user_input[:100]}...")
 
-            prompt = self._create_prompt(self.system_prompt, user_input)
+            # Check if in demo mode
+            if self.config.demo_mode or self.api_client is None:
+                logger.info("Using mock data for preferences (demo mode)")
+                preferences = get_mock_preferences(user_input)
+                response_text = json.dumps(preferences, indent=2)
+            else:
+                prompt = self._create_prompt(self.system_prompt, user_input)
 
-            # Generate response
-            response_text = self.api_client.generate_content(
-                prompt, temperature=0.3  # Lower temperature for more consistent extraction
-            )
+                # Generate response
+                response_text = self.api_client.generate_content(
+                    prompt, temperature=0.3  # Lower temperature for more consistent extraction
+                )
 
-            # Parse JSON response
-            preferences = self._parse_json_response(response_text)
+                # Parse JSON response
+                preferences = self._parse_json_response(response_text)
 
             logger.info(f"Successfully extracted preferences: {list(preferences.keys())}")
             return {

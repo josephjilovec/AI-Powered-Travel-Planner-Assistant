@@ -12,8 +12,15 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from src.agents.base_agent import BaseAgent
 from utils.logger import get_logger
+from utils.mock_data import get_mock_recommendations
 
 logger = get_logger(__name__)
 
@@ -71,28 +78,34 @@ Provide realistic recommendations that match the user's preferences."""
 
             logger.info(f"Searching recommendations for destination: {destination}")
 
-            # Build user input
-            user_input = f"Destination: {destination}\n"
-            user_input += f"Trip Duration: {duration} days\n"
+            # Check if in demo mode
+            if self.config.demo_mode or self.api_client is None:
+                logger.info("Using mock data for recommendations (demo mode)")
+                recommendations = get_mock_recommendations(destination, preferences)
+                response_text = recommendations.get("full_text", "")
+            else:
+                # Build user input
+                user_input = f"Destination: {destination}\n"
+                user_input += f"Trip Duration: {duration} days\n"
 
-            if budget:
-                user_input += f"Budget: ${budget:,.2f}\n"
+                if budget:
+                    user_input += f"Budget: ${budget:,.2f}\n"
 
-            user_input += f"\nPreferences:\n"
-            if isinstance(preferences, dict):
-                for key, value in preferences.items():
-                    if value:
-                        user_input += f"- {key}: {value}\n"
+                user_input += f"\nPreferences:\n"
+                if isinstance(preferences, dict):
+                    for key, value in preferences.items():
+                        if value:
+                            user_input += f"- {key}: {value}\n"
 
-            prompt = self._create_prompt(self.system_prompt, user_input)
+                prompt = self._create_prompt(self.system_prompt, user_input)
 
-            # Generate response
-            response_text = self.api_client.generate_content(
-                prompt, temperature=0.7  # Higher temperature for creative recommendations
-            )
+                # Generate response
+                response_text = self.api_client.generate_content(
+                    prompt, temperature=0.7  # Higher temperature for creative recommendations
+                )
 
-            # Parse and structure response
-            recommendations = self._parse_recommendations(response_text, destination)
+                # Parse and structure response
+                recommendations = self._parse_recommendations(response_text, destination)
 
             logger.info(f"Successfully generated recommendations for {destination}")
             return {

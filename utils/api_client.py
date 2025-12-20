@@ -28,6 +28,12 @@ class GeminiAPIClient:
     def __init__(self) -> None:
         """Initialize the Gemini API client."""
         config = get_config()
+        
+        # Don't initialize if in demo mode
+        if config.demo_mode:
+            logger.info("Skipping API client initialization (demo mode)")
+            raise RuntimeError("API client not available in demo mode")
+        
         config.validate()
 
         try:

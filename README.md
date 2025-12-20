@@ -42,8 +42,8 @@ AI-Powered-Travel-Planner-Assistant/
 ### Prerequisites
 
 - Python 3.9 or higher
-- Google Cloud Project with Gemini API enabled
-- Gemini API key
+- **Optional**: Google Cloud Project with Gemini API enabled and API key (for production)
+- **For Demo**: No API key needed! See [DEMO_MODE.md](DEMO_MODE.md)
 
 ### Local Development
 
@@ -69,7 +69,18 @@ AI-Powered-Travel-Planner-Assistant/
    pip install -r requirements.txt
    ```
 
-4. **Configure environment variables**
+4. **Configure environment variables (Optional)**
+   
+   **Option A: Demo Mode (No API key needed)**
+   ```bash
+   # Windows
+   set DEMO_MODE=true
+   
+   # macOS/Linux
+   export DEMO_MODE=true
+   ```
+   
+   **Option B: Production Mode (Requires API key)**
    
    Create a `.env` file in the root directory:
    ```env
@@ -112,8 +123,17 @@ AI-Powered-Travel-Planner-Assistant/
 ### Step 3: Configure Secrets
 
 1. In your Streamlit Cloud app dashboard, go to "Settings" → "Secrets"
-2. Add your secrets in TOML format:
+2. Choose one of the following:
+
+   **Option A: Demo Mode (No API key needed - Perfect for showcasing!)**
    ```toml
+   DEMO_MODE = "true"
+   ```
+   This enables demo mode with mock data. Perfect for demonstrating the UI without needing an API key.
+
+   **Option B: Production Mode (Requires API key)**
+   ```toml
+   DEMO_MODE = "false"
    GEMINI_API_KEY = "your_api_key_here"
    ```
    
@@ -125,7 +145,9 @@ AI-Powered-Travel-Planner-Assistant/
    TIMEOUT = "30"
    ```
 
-3. Save and the app will automatically redeploy
+3. Click "Save" and the app will automatically redeploy
+
+> 💡 **Tip**: Start with Demo Mode to showcase your app, then switch to production mode when ready!
 
 ## 📋 Configuration
 
@@ -133,18 +155,34 @@ AI-Powered-Travel-Planner-Assistant/
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `GEMINI_API_KEY` | Google Gemini API key | Yes | - |
+| `DEMO_MODE` | Enable demo mode (uses mock data, no API key needed) | No | `false` (auto-enabled if no API key) |
+| `GEMINI_API_KEY` | Google Gemini API key | Yes* | - |
 | `GEMINI_MODEL` | Gemini model to use | No | `gemini-pro` |
 | `MAX_RETRIES` | Maximum API retry attempts | No | `3` |
 | `TIMEOUT` | API timeout in seconds | No | `30` |
+
+*Required only if `DEMO_MODE` is `false` or not set and you want to use real AI features.
 
 ### Local Development
 
 For local development, use a `.env` file or environment variables.
 
+**Demo Mode Example:**
+```bash
+export DEMO_MODE=true
+```
+
+**Production Mode Example:**
+```bash
+export GEMINI_API_KEY=your_key_here
+export DEMO_MODE=false
+```
+
 ### Streamlit Cloud
 
 For Streamlit Cloud deployment, use the Secrets management in the dashboard (see Deployment section above).
+
+> 📖 **Learn more**: See [DEMO_MODE.md](DEMO_MODE.md) for detailed information about demo mode.
 
 ## 🧪 Testing
 

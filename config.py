@@ -24,21 +24,42 @@ class Config:
         self._model_name: str = "gemini-pro"
         self._max_retries: int = 3
         self._timeout: int = 30
+        self._demo_mode: bool = False
         self._load_config()
 
     def _load_config(self) -> None:
         """Load configuration from Streamlit secrets or environment variables."""
         try:
+            # Check for demo mode flag
+            demo_mode_env = os.environ.get("DEMO_MODE", "false").lower()
+            demo_mode_secret = False
+            if hasattr(st, "secrets"):
+                demo_mode_secret = st.secrets.get("DEMO_MODE", "false").lower() == "true"
+            
+            self._demo_mode = demo_mode_env == "true" or demo_mode_secret
+            
             # Try to get API key from Streamlit secrets (for Streamlit Cloud)
             if hasattr(st, "secrets") and "GEMINI_API_KEY" in st.secrets:
-                self._api_key = st.secrets["GEMINI_API_KEY"]
-                logger.info("Loaded API key from Streamlit secrets")
+                api_key = st.secrets["GEMINI_API_KEY"]
+                # Allow placeholder/demo keys
+                if api_key and api_key.strip() and api_key.lower() not in ["demo", "placeholder", "your_api_key_here"]:
+                    self._api_key = api_key
+                    logger.info("Loaded API key from Streamlit secrets")
+                else:
+                    logger.info("Demo/placeholder API key detected, enabling demo mode")
+                    self._demo_mode = True
             # Fallback to environment variable (for local development)
             elif "GEMINI_API_KEY" in os.environ:
-                self._api_key = os.environ["GEMINI_API_KEY"]
-                logger.info("Loaded API key from environment variable")
+                api_key = os.environ["GEMINI_API_KEY"]
+                if api_key and api_key.strip() and api_key.lower() not in ["demo", "placeholder", "your_api_key_here"]:
+                    self._api_key = api_key
+                    logger.info("Loaded API key from environment variable")
+                else:
+                    logger.info("Demo/placeholder API key detected, enabling demo mode")
+                    self._demo_mode = True
             else:
-                logger.warning("API key not found in secrets or environment variables")
+                logger.info("API key not found - enabling demo mode")
+                self._demo_mode = True
 
             # Load optional configuration
             if hasattr(st, "secrets"):
@@ -52,7 +73,8 @@ class Config:
 
         except Exception as e:
             logger.error(f"Error loading configuration: {e}", exc_info=True)
-            raise
+            # Default to demo mode on error
+            self._demo_mode = True
 
     @property
     def api_key(self) -> Optional[str]:
@@ -74,12 +96,23 @@ class Config:
         """Get the timeout for API calls in seconds."""
         return self._timeout
 
+    @property
+    def demo_mode(self) -> bool:
+        """Check if demo mode is enabled."""
+        return self._demo_mode
+
     def validate(self) -> bool:
         """Validate that required configuration is present."""
+        # In demo mode, API key is not required
+        if self._demo_mode:
+            logger.info("Running in DEMO MODE - using mock data")
+            return True
+        
         if not self._api_key:
             raise ValueError(
                 "GEMINI_API_KEY is required. "
-                "Set it in Streamlit secrets or as an environment variable."
+                "Set it in Streamlit secrets or as an environment variable. "
+                "Or set DEMO_MODE=true to use demo/mock data."
             )
         return True
 

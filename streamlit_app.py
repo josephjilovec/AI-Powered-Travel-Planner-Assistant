@@ -121,6 +121,14 @@ def main() -> None:
         config = get_config()
         config.validate()
 
+        # Show demo mode banner if applicable
+        if config.demo_mode:
+            st.info(
+                "🎭 **DEMO MODE**: This application is running with mock/demo data. "
+                "To use real AI features, configure your GEMINI_API_KEY in Streamlit secrets "
+                "or set DEMO_MODE=false. The demo showcases the UI and workflow with sample data."
+            )
+
         # Render header
         render_header()
 
@@ -144,12 +152,19 @@ def main() -> None:
             render_about_page()
 
     except ValueError as e:
-        st.error(f"Configuration Error: {str(e)}")
-        st.info(
-            "Please configure your GEMINI_API_KEY in Streamlit secrets "
-            "(for Streamlit Cloud) or as an environment variable (for local development)."
-        )
-        logger.error(f"Configuration error: {e}", exc_info=True)
+        # In demo mode, we should not raise this error
+        config = get_config()
+        if not config.demo_mode:
+            st.error(f"Configuration Error: {str(e)}")
+            st.info(
+                "Please configure your GEMINI_API_KEY in Streamlit secrets "
+                "(for Streamlit Cloud) or as an environment variable (for local development). "
+                "Alternatively, set DEMO_MODE=true to use demo data."
+            )
+            logger.error(f"Configuration error: {e}", exc_info=True)
+        else:
+            # Demo mode is active, continue
+            pass
 
     except Exception as e:
         render_error_message(e)

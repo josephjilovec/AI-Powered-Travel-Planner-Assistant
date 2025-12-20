@@ -12,8 +12,15 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from src.agents.base_agent import BaseAgent
 from utils.logger import get_logger
+from utils.mock_data import get_mock_itinerary
 
 logger = get_logger(__name__)
 
@@ -81,33 +88,48 @@ Make the itinerary engaging, practical, and aligned with the user's interests.""
                 f"Creating {duration}-day itinerary for destination: {destination}"
             )
 
-            # Build user input
-            user_input = f"Destination: {destination}\n"
-            user_input += f"Trip Duration: {duration} days\n"
-            user_input += f"Start Date: {start_date}\n\n"
+            # Check if in demo mode
+            if self.config.demo_mode or self.api_client is None:
+                logger.info("Using mock data for itinerary (demo mode)")
+                itinerary = get_mock_itinerary(destination, duration, preferences)
+                response_text = f"Demo Itinerary for {destination} ({duration} days)\n\n"
+                for day_data in itinerary:
+                    response_text += f"Day {day_data['day']}:\n"
+                    if day_data.get("morning"):
+                        response_text += f"Morning: {', '.join(day_data['morning'])}\n"
+                    if day_data.get("afternoon"):
+                        response_text += f"Afternoon: {', '.join(day_data['afternoon'])}\n"
+                    if day_data.get("evening"):
+                        response_text += f"Evening: {', '.join(day_data['evening'])}\n"
+                    response_text += "\n"
+            else:
+                # Build user input
+                user_input = f"Destination: {destination}\n"
+                user_input += f"Trip Duration: {duration} days\n"
+                user_input += f"Start Date: {start_date}\n\n"
 
-            user_input += "User Preferences:\n"
-            if isinstance(preferences, dict):
-                for key, value in preferences.items():
-                    if value:
-                        user_input += f"- {key}: {value}\n"
+                user_input += "User Preferences:\n"
+                if isinstance(preferences, dict):
+                    for key, value in preferences.items():
+                        if value:
+                            user_input += f"- {key}: {value}\n"
 
-            user_input += "\nAvailable Recommendations:\n"
-            if isinstance(recommendations, dict):
-                if "full_text" in recommendations:
-                    user_input += recommendations["full_text"]
-                else:
-                    user_input += str(recommendations)
+                user_input += "\nAvailable Recommendations:\n"
+                if isinstance(recommendations, dict):
+                    if "full_text" in recommendations:
+                        user_input += recommendations["full_text"]
+                    else:
+                        user_input += str(recommendations)
 
-            prompt = self._create_prompt(self.system_prompt, user_input)
+                prompt = self._create_prompt(self.system_prompt, user_input)
 
-            # Generate response
-            response_text = self.api_client.generate_content(
-                prompt, temperature=0.8  # Higher temperature for creative planning
-            )
+                # Generate response
+                response_text = self.api_client.generate_content(
+                    prompt, temperature=0.8  # Higher temperature for creative planning
+                )
 
-            # Parse itinerary
-            itinerary = self._parse_itinerary(response_text, duration)
+                # Parse itinerary
+                itinerary = self._parse_itinerary(response_text, duration)
 
             logger.info(f"Successfully created {duration}-day itinerary")
             return {

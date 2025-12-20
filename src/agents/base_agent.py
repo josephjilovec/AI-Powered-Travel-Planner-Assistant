@@ -13,6 +13,7 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from config import get_config
 from utils.api_client import GeminiAPIClient
 from utils.logger import get_logger
 
@@ -30,8 +31,20 @@ class BaseAgent(ABC):
             name: Name of the agent.
         """
         self.name = name
-        self.api_client = GeminiAPIClient()
-        logger.info(f"Initialized {self.name} agent")
+        self.config = get_config()
+        
+        # Only initialize API client if not in demo mode
+        if not self.config.demo_mode:
+            try:
+                self.api_client = GeminiAPIClient()
+            except Exception as e:
+                logger.warning(f"Failed to initialize API client: {e}. Using demo mode.")
+                self.config._demo_mode = True
+                self.api_client = None
+        else:
+            self.api_client = None
+            
+        logger.info(f"Initialized {self.name} agent (Demo Mode: {self.config.demo_mode})")
 
     @abstractmethod
     def process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
