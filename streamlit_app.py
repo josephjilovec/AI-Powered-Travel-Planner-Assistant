@@ -20,9 +20,9 @@ from components.ui_components import (
     render_header,
     render_itinerary,
     render_loading_state,
+    render_navigation,
     render_preferences_summary,
     render_recommendations,
-    render_sidebar,
     render_trip_form,
 )
 from config import get_config
@@ -32,26 +32,27 @@ from utils.logger import setup_logging
 # Configure logging
 logger = setup_logging(log_level="INFO")
 
-# Page configuration
+# Page configuration - Mobile optimized
 st.set_page_config(
     page_title="AI Travel Planner",
     page_icon="✈️",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",  # Collapsed for mobile users
 )
 
-# Custom CSS for professional appearance
+# Custom CSS for professional appearance and mobile responsiveness
 st.markdown(
     """
     <style>
     .main {
-        padding-top: 2rem;
+        padding-top: 1rem;
     }
     .stButton>button {
         width: 100%;
         border-radius: 5px;
         height: 3rem;
         font-size: 1.1rem;
+        margin-bottom: 0.5rem;
     }
     h1 {
         color: #1f77b4;
@@ -61,6 +62,31 @@ st.markdown(
     }
     .stSidebar {
         background-color: #f8f9fa;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .main .block-container {
+            padding: 1rem;
+        }
+        [data-testid="column"] {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+        }
+        h1 {
+            font-size: 1.5rem !important;
+        }
+        h2 {
+            font-size: 1.25rem !important;
+        }
+    }
+    
+    /* Better spacing for mobile */
+    @media (max-width: 768px) {
+        .element-container {
+            width: 100% !important;
+            padding-bottom: 0.5rem;
+        }
     }
     </style>
     """,
@@ -132,9 +158,8 @@ def main() -> None:
         # Render header
         render_header()
 
-        # Render sidebar and get state
-        sidebar_state = render_sidebar()
-        current_page = sidebar_state["page"]
+        # Render navigation at top (mobile-friendly)
+        current_page = render_navigation()
 
         # Initialize session state
         if "trip_data" not in st.session_state:
@@ -180,14 +205,14 @@ def render_plan_trip_page() -> None:
 
     # Process form submission
     if form_data["submit"]:
-        # Validate required fields
-        if not form_data["destination"]:
-            st.warning("Please enter a destination.")
+        # Validate required fields - UX Safety Feature
+        if not form_data["destination"] or not form_data["destination"].strip():
+            st.warning("⚠️ Please enter a destination to begin!")
             return
 
         if not form_data["user_input"] and not form_data["interests"]:
             st.warning(
-                "Please provide some information about your preferences or interests."
+                "⚠️ Please provide some information about your preferences or interests."
             )
             return
 
@@ -214,9 +239,9 @@ def render_plan_trip_page() -> None:
             if form_data["dietary"]:
                 user_input += f". Dietary: {', '.join(form_data['dietary'])}"
 
-        # Show loading state
-        with st.spinner("🤖 AI is planning your perfect trip..."):
-            try:
+        # Show loading state - UX Safety Feature
+        try:
+            with st.spinner("🤖 Generating your custom itinerary... This may take a moment."):
                 # Plan trip
                 trip_data = plan_trip_cached(
                     destination=form_data["destination"],
@@ -233,15 +258,18 @@ def render_plan_trip_page() -> None:
                 st.session_state.trip_data = trip_data
                 st.session_state.current_step = "results"
 
-                # Show success message
-                st.success("✅ Trip plan generated successfully!")
+                # Success cues - UX Safety Feature
+                st.success("✅ Itinerary Ready!")
+                st.balloons()  # Celebration animation
 
                 # Render results
                 render_trip_results(trip_data)
 
-            except Exception as e:
-                render_error_message(e)
-                logger.error(f"Error planning trip: {e}", exc_info=True)
+        except Exception as e:
+            # Friendly error message - UX Safety Feature
+            st.error("😅 Oops! The travel spirits are busy. Please try again in a moment.")
+            st.info("If this problem persists, check your internet connection or try again later.")
+            logger.error(f"Error planning trip: {e}", exc_info=True)
 
     # Show existing results if available
     elif st.session_state.trip_data and st.session_state.current_step == "results":

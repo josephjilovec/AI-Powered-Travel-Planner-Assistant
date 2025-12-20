@@ -34,23 +34,39 @@ def render_header() -> None:
     )
 
 
+def render_navigation() -> str:
+    """
+    Render navigation at the top of the page (mobile-friendly).
+    
+    Returns:
+        Selected page name.
+    """
+    # Use segmented control for better mobile UX
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = "Plan Trip"
+    
+    # Navigation at top - mobile responsive
+    page = st.segmented_control(
+        "Navigation",
+        options=["Plan Trip", "View Itinerary", "About"],
+        default=st.session_state.current_page,
+        key="top_navigation",
+    )
+    
+    st.session_state.current_page = page
+    st.divider()
+    
+    return page
+
+
 def render_sidebar() -> Dict[str, Any]:
     """
-    Render the sidebar with navigation and settings.
+    Render the sidebar with settings (optional, for desktop users).
 
     Returns:
         Dictionary with sidebar state.
     """
     with st.sidebar:
-        st.header("🗺️ Navigation")
-        page = st.radio(
-            "Select Page",
-            ["Plan Trip", "View Itinerary", "About"],
-            key="navigation",
-        )
-
-        st.divider()
-
         st.header("⚙️ Settings")
         temperature = st.slider(
             "AI Creativity",
@@ -72,30 +88,58 @@ def render_sidebar() -> Dict[str, Any]:
             unsafe_allow_html=True,
         )
 
-    return {"page": page, "temperature": temperature}
+    return {"temperature": temperature}
 
 
 def render_trip_form() -> Dict[str, Any]:
     """
-    Render the trip planning form.
+    Render the trip planning form (mobile-responsive).
 
     Returns:
         Dictionary with form data.
     """
     st.header("📝 Trip Details")
 
+    # Check if sample data should be loaded
+    sample_loaded = st.session_state.get("sample_data_loaded", False)
+    
+    # Example data button - UX Safety Feature (placed at top for visibility)
+    sample_btn = st.button("📋 Fill with Sample Data (Paris)", use_container_width=True, key="sample_data_btn")
+    if sample_btn:
+        st.session_state.sample_data_loaded = True
+        st.rerun()
+
+    # Responsive columns - stack on mobile automatically
     col1, col2 = st.columns(2)
+
+    # Get default values (sample data or empty)
+    default_destination = "Paris, France" if sample_loaded else ""
+    default_duration = 5 if sample_loaded else 7
+    default_budget = 2000.0 if sample_loaded else 0.0
+    default_user_input = (
+        "I love museums, art galleries, and fine dining. "
+        "I prefer luxury accommodations and I'm interested in history and culture."
+        if sample_loaded
+        else ""
+    )
+    default_travel_style = "Luxury" if sample_loaded else ""
+    default_accommodation = "Hotel" if sample_loaded else ""
+    default_interests = ["Museums", "Art Galleries", "Food & Dining", "History"] if sample_loaded else []
+    default_dietary = ["Vegetarian"] if sample_loaded else []
 
     with col1:
         destination = st.text_input(
-            "Destination",
+            "Destination *",
+            value=default_destination,
             placeholder="e.g., Paris, France",
-            help="Enter your travel destination",
+            help="Enter your travel destination (required)",
+            key="form_destination",
         )
 
         start_date = st.date_input(
             "Start Date",
             help="When does your trip begin?",
+            key="form_start_date",
         )
 
     with col2:
@@ -103,16 +147,18 @@ def render_trip_form() -> Dict[str, Any]:
             "Duration (days)",
             min_value=1,
             max_value=365,
-            value=7,
+            value=default_duration,
             help="How many days is your trip?",
+            key="form_duration",
         )
 
         budget = st.number_input(
             "Budget (USD)",
             min_value=0.0,
-            value=0.0,
+            value=default_budget,
             step=100.0,
             help="Optional: Enter your budget (0 = no budget specified)",
+            key="form_budget",
         )
 
     st.divider()
@@ -124,6 +170,7 @@ def render_trip_form() -> Dict[str, Any]:
 
     user_input = st.text_area(
         "Describe your preferences",
+        value=default_user_input,
         placeholder=(
             "e.g., I love museums, art galleries, and fine dining. "
             "I prefer luxury accommodations and I'm vegetarian. "
@@ -131,15 +178,19 @@ def render_trip_form() -> Dict[str, Any]:
         ),
         height=150,
         help="Describe your interests, travel style, dietary restrictions, etc.",
+        key="form_user_input",
     )
 
+    # Responsive columns - stack on mobile
     col1, col2 = st.columns(2)
 
     with col1:
         travel_style = st.selectbox(
             "Travel Style",
             ["", "Budget", "Mid-range", "Luxury", "Adventure", "Relaxation", "Family"],
+            index=3 if sample_loaded else 0,  # Luxury is index 3
             help="What's your preferred travel style?",
+            key="form_travel_style",
         )
 
         accommodation = st.selectbox(
@@ -153,7 +204,9 @@ def render_trip_form() -> Dict[str, Any]:
                 "Boutique Hotel",
                 "No preference",
             ],
+            index=1 if sample_loaded else 0,  # Hotel is index 1
             help="What type of accommodation do you prefer?",
+            key="form_accommodation",
         )
 
     with col2:
@@ -173,7 +226,9 @@ def render_trip_form() -> Dict[str, Any]:
                 "Religious Sites",
                 "Architecture",
             ],
+            default=default_interests,
             help="Select your interests (can select multiple)",
+            key="form_interests",
         )
 
         dietary = st.multiselect(
@@ -188,10 +243,26 @@ def render_trip_form() -> Dict[str, Any]:
                 "Dairy-free",
                 "Nut allergy",
             ],
+            default=default_dietary,
             help="Any dietary restrictions or preferences?",
+            key="form_dietary",
         )
 
-    submit_button = st.button("🚀 Plan My Trip", type="primary", use_container_width=True)
+    st.divider()
+
+    # Submit and Clear buttons
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        submit_button = st.button("🚀 Plan My Trip", type="primary", use_container_width=True, key="submit_btn")
+    
+    with col2:
+        # Clear/Reset button - UX Safety Feature
+        if st.button("🔄 Clear Form", use_container_width=True, key="clear_btn"):
+            # Clear sample data flag and rerun
+            if "sample_data_loaded" in st.session_state:
+                del st.session_state.sample_data_loaded
+            st.rerun()
 
     return {
         "destination": destination,
@@ -209,7 +280,7 @@ def render_trip_form() -> Dict[str, Any]:
 
 def render_preferences_summary(preferences: Dict[str, Any]) -> None:
     """
-    Render a summary of extracted preferences.
+    Render a summary of extracted preferences (mobile-responsive).
 
     Args:
         preferences: Preferences dictionary.
@@ -220,6 +291,7 @@ def render_preferences_summary(preferences: Dict[str, Any]) -> None:
         st.info("No preferences extracted yet.")
         return
 
+    # Responsive columns - stack on mobile
     cols = st.columns(3)
 
     with cols[0]:
@@ -303,7 +375,7 @@ def render_recommendations(recommendations: Dict[str, Any]) -> None:
 
 def render_itinerary(itinerary_data: Dict[str, Any]) -> None:
     """
-    Render the travel itinerary.
+    Render the travel itinerary (mobile-responsive).
 
     Args:
         itinerary_data: Itinerary dictionary.
@@ -330,6 +402,7 @@ def render_itinerary(itinerary_data: Dict[str, Any]) -> None:
 
             st.markdown(f"### {day_header}")
 
+            # Responsive columns - stack on mobile
             col1, col2, col3 = st.columns(3)
 
             with col1:
@@ -409,15 +482,16 @@ def render_about_page() -> None:
 
 def render_error_message(error: Exception) -> None:
     """
-    Render an error message to the user.
+    Render a friendly error message to the user.
 
     Args:
         error: Exception that occurred.
     """
-    st.error(f"❌ An error occurred: {str(error)}")
+    # Friendly error message - UX Safety Feature
+    st.error("😅 Oops! The travel spirits are busy. Please try again in a moment.")
     st.info(
-        "Please check your API key configuration and try again. "
-        "If the problem persists, check the logs for more details."
+        "If this problem persists, check your internet connection or try again later. "
+        "You can also try using the 'Fill with Sample Data' button to test the app."
     )
 
 
