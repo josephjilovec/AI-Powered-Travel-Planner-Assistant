@@ -1,0 +1,33 @@
+# Streamlit Cloud Configuration
+# This file configures Streamlit-specific settings for deployment
+
+[server]
+# Run in headless mode (no browser)
+headless = true
+
+# Port configuration (Streamlit Cloud handles this automatically)
+# port = 8501
+
+# Enable CORS for API access if needed
+# enableCORS = false
+
+# Enable XSRF protection
+# enableXsrfProtection = true
+
+[browser]
+# Automatically open browser (disabled for Streamlit Cloud)
+gatherUsageStats = false
+
+[theme]
+# Custom theme configuration
+primaryColor = "#1f77b4"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+[ui]
+# Hide the hamburger menu in production (optional)
+# hideTopBar = false
+# hideSidebarNav = false
+
