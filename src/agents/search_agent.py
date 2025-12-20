@@ -4,25 +4,20 @@ Search Agent for AI-Powered Travel Planner Assistant.
 Searches for travel destinations, activities, and recommendations based on preferences.
 """
 
+import logging
+import sys
+from pathlib import Path
 from typing import Any, Dict, List
 
-import sys
-from pathlib import Path
-
 # Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-import sys
-from pathlib import Path
-
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 from src.agents.base_agent import BaseAgent
-from utils.logger import get_logger
 from utils.mock_data import get_mock_recommendations
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class SearchAgent(BaseAgent):

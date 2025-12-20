@@ -12,7 +12,10 @@ from typing import Any, Dict, Optional
 import streamlit as st
 
 # Add current directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent))
+# This ensures components and utils can be imported
+project_root = Path(__file__).parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 from components.ui_components import (
     render_about_page,
@@ -25,12 +28,22 @@ from components.ui_components import (
     render_recommendations,
     render_trip_form,
 )
-from config import get_config
-from src.orchestrator import TravelPlannerOrchestrator
-from utils.logger import setup_logging
+import logging
 
 # Configure logging
-logger = setup_logging(log_level="INFO")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Import after path setup
+try:
+    from config import get_config
+    from src.orchestrator import TravelPlannerOrchestrator
+except ImportError as e:
+    logger.error(f"Import error: {e}")
+    raise
 
 # Page configuration - Mobile optimized
 st.set_page_config(

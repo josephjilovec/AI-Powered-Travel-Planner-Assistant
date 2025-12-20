@@ -8,15 +8,10 @@ from typing import Any, Dict, List, Optional
 
 import streamlit as st
 
-import sys
-from pathlib import Path
+import logging
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
+# Use standard logging instead of custom logger to avoid import issues
+logger = logging.getLogger(__name__)
 
 
 def render_header() -> None:
@@ -41,16 +36,18 @@ def render_navigation() -> str:
     Returns:
         Selected page name.
     """
-    # Use segmented control for better mobile UX
+    # Use radio buttons for navigation (compatible with all Streamlit versions)
     if "current_page" not in st.session_state:
         st.session_state.current_page = "Plan Trip"
     
     # Navigation at top - mobile responsive
-    page = st.segmented_control(
+    # Using horizontal radio buttons
+    page = st.radio(
         "Navigation",
         options=["Plan Trip", "View Itinerary", "About"],
-        default=st.session_state.current_page,
+        index=["Plan Trip", "View Itinerary", "About"].index(st.session_state.current_page) if st.session_state.current_page in ["Plan Trip", "View Itinerary", "About"] else 0,
         key="top_navigation",
+        horizontal=True,  # Makes it horizontal and mobile-friendly
     )
     
     st.session_state.current_page = page

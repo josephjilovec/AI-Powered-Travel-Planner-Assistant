@@ -12,10 +12,19 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import sys
+from pathlib import Path
+
+# Ensure project root is in path
+project_root = Path(__file__).parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
 from src.agents.itinerary_agent import ItineraryAgent
 from src.agents.preference_agent import PreferenceAgent
 from src.agents.search_agent import SearchAgent
-from utils.logger import get_logger
+import logging
+
 from utils.validators import (
     ValidationError,
     validate_budget,
@@ -24,7 +33,7 @@ from utils.validators import (
     validate_preferences,
 )
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class TravelPlannerOrchestrator:

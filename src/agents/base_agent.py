@@ -8,16 +8,18 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict
 
 import sys
+import logging
 from pathlib import Path
 
 # Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 from config import get_config
 from utils.api_client import GeminiAPIClient
-from utils.logger import get_logger
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class BaseAgent(ABC):

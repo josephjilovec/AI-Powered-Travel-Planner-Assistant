@@ -7,9 +7,9 @@ Provides validation functions for user inputs and data structures.
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from utils.logger import get_logger
+import logging
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class ValidationError(Exception):

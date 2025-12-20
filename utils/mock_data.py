@@ -7,9 +7,9 @@ Provides sample data when API key is not available.
 import json
 from typing import Any, Dict, List
 
-from utils.logger import get_logger
+import logging
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def get_mock_preferences(user_input: str) -> Dict[str, Any]:
